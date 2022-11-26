@@ -120,7 +120,7 @@ export default {
         const width = 320;
         const height = 240;
 
-        // カメラ設定 
+        // カメラ設定
         const fov = 45;           // 画角
         const aspect = width / height; // アスペクト比
         const near = 0.1;          // 最低描画距離
@@ -132,7 +132,7 @@ export default {
 
         // カメラ設定
         this.camera.fov = fov;
-        this.camera.aspect = width / height;
+        this.camera.aspect = aspect;
         this.camera.near = near;
         this.camera.far = far;
 
@@ -149,7 +149,7 @@ export default {
         animate() {
             requestAnimationFrame(this.animate);
 
-            //this.presentBox.rotation.x += 0.01;
+            this.presentBox.rotation.x += 0.01;
             this.presentBox.rotation.y += 0.01;
 
             this.renderer.clear();

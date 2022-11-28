@@ -1,11 +1,11 @@
 <template>
   <div>
-    <no-ssr>
+    <client-only>
       <artwork></artwork>
-    </no-ssr>
-    <no-ssr>
+    </client-only>
+    <client-only>
       <space></space>
-    </no-ssr>
+    </client-only>
   </div>
 </template>
 <script>

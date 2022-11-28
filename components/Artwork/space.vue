@@ -1,7 +1,6 @@
 <template>
     <div class="content">
         <v-card elevation="2">
-            <!--idではなくrefで指定-->
             <div class="canvas" ref="canvas"></div>
         </v-card>
     </div>
@@ -9,33 +8,33 @@
 
 <script>
 import * as THREE from 'three';
-//import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 export default {
     data() {
-        let scene = new THREE.Scene
-        let camera = new THREE.PerspectiveCamera(
+        const scene = new THREE.Scene
+        const camera = new THREE.PerspectiveCamera(
             50,
             window.innerWidth / window.innerHeight,
             0.1,
             1000
         );
+        // 地球のジオメトリを作成
+        const earthGeometory = new THREE.SphereGeometry(100, 64, 32)
+        // マテリアルを作成
+        const earthMerial = new THREE.MeshStandardMaterial();
+        const earthMesh = new THREE.Mesh(earthGeometory, earthMerial);
+
         // レンダラーを追加する
-        let renderer = new THREE.WebGLRenderer({ alpha: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
 
-        const earthURL = require('@/assets/textures/earth.jpg'); // need require when local image
-        const moonURL = require('@/assets/textures/moon.png');
-
         // 光原を追加
-        let derectionalLight = new THREE.DirectionalLight(0xffffff, 2);
+        const derectionalLight = new THREE.DirectionalLight(0xffffff, 1);
 
-        camera.position.set(0, 0, +500);
+        camera.position.set(0, 0, +600);
         derectionalLight.position.set(1, 1, 1);
 
-        // scene.add(earthMesh);
-        // scene.add(moonMesh);
         scene.add(derectionalLight);
 
         return {
@@ -43,38 +42,42 @@ export default {
             camera: camera,
             renderer: renderer,
             derectionalLight: derectionalLight,
-            earthURL: earthURL,
-            moonURL: moonURL,
+            earthURL: require('@/assets/textures/earth.jpg'),
+            moonURL: require('@/assets/textures/moon.png'),
+            earthGeometory: earthGeometory,
+            earthMerial: earthMerial,
+            earthMesh: earthMesh,
         }
     },
     mounted() {
+        this.initialize();
+    },
+    methods: {
+        initialize() {
+            // テクスチャーを追加
+            this.earthMerial = new THREE.MeshStandardMaterial({ color: 0xff5555 })
+            this.earthMerial.needsUpdate = true;
+            this.earthMesh = new THREE.Mesh(this.earthGeometory, this.earthMerial);
+            this.earthMesh.name = 'earth';
 
-        // テクスチャーを追加
-        let earthTexture = new THREE.TextureLoader().load(this.earthURL);
-        let moonTexture = new THREE.TextureLoader().load(this.moonURL);
+            let moonTexture = new THREE.TextureLoader().load(this.moonURL);
 
-        // 地球のジオメトリを作成
-        let earthGeometory = new THREE.SphereGeometry(100, 64, 32)
-        // 月のジオメトリを作成
-        let moonGeometory = new THREE.SphereGeometry(20, 64, 32)
+            // 月のジオメトリを作成
+            let moonGeometory = new THREE.SphereGeometry(20, 64, 32)
+            // マテリアルを作成
+            let moonMerial = new THREE.MeshStandardMaterial({ color: 0xff5555 });
+            // メッシュ化する
+            let moonMesh = new THREE.Mesh(moonGeometory, moonMerial);
 
-        // マテリアルを作成
-        let earthMerial = new THREE.MeshPhysicalMaterial({ map: earthTexture });
-        let earthMesh = new THREE.Mesh(earthGeometory, earthMerial);
+            this.scene.add(this.earthMesh);
+            this.scene.add(moonMesh);
+            moonMesh.position.set(-200, -200, -200)
 
-        // マテリアルを作成
-        let moonMerial = new THREE.MeshPhysicalMaterial({ map: moonTexture });
-        // メッシュ化する
-        let moonMesh = new THREE.Mesh(moonGeometory, moonMerial);
-        console.log(moonMesh)
-        this.scene.add(earthMesh);
-        this.scene.add(moonMesh);
-        moonMesh.position.set(-200, -200, -200)
-
-        this.camera.updateProjectionMatrix();
-        this.renderer.render(this.scene, this.camera);
-        this.$refs.canvas.appendChild(this.renderer.domElement);
-    }
+            this.camera.updateProjectionMatrix();
+            this.renderer.render(this.scene, this.camera);
+            this.$refs.canvas.appendChild(this.renderer.domElement);
+        },
+    },
 }
 </script>
 

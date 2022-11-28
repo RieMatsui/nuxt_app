@@ -2,14 +2,14 @@
     <div class="content">
         <v-card elevation="2">
             <!--idではなくrefで指定-->
-            <div ref="canvas"></div>
+            <div class="canvas" ref="canvas"></div>
         </v-card>
     </div>
 </template>
 
 <script>
 import * as THREE from 'three';
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+//import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 export default {
     data() {
         let scene = new THREE.Scene
@@ -25,9 +25,33 @@ export default {
         renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
 
+        const earthURL = require('@/assets/textures/earth.jpg'); // need require when local image
+        const moonURL = require('@/assets/textures/moon.png');
+
+        // 光原を追加
+        let derectionalLight = new THREE.DirectionalLight(0xffffff, 2);
+
+        camera.position.set(0, 0, +500);
+        derectionalLight.position.set(1, 1, 1);
+
+        // scene.add(earthMesh);
+        // scene.add(moonMesh);
+        scene.add(derectionalLight);
+
+        return {
+            scene: scene,
+            camera: camera,
+            renderer: renderer,
+            derectionalLight: derectionalLight,
+            earthURL: earthURL,
+            moonURL: moonURL,
+        }
+    },
+    mounted() {
+
         // テクスチャーを追加
-        let earthTexture = new THREE.TextureLoader().load("../../textures/earth.jpg");
-        let moonTexture = new THREE.TextureLoader().load("../../textures/moon.png");
+        let earthTexture = new THREE.TextureLoader().load(this.earthURL);
+        let moonTexture = new THREE.TextureLoader().load(this.moonURL);
 
         // 地球のジオメトリを作成
         let earthGeometory = new THREE.SphereGeometry(100, 64, 32)
@@ -40,32 +64,14 @@ export default {
 
         // マテリアルを作成
         let moonMerial = new THREE.MeshPhysicalMaterial({ map: moonTexture });
-          // メッシュ化する
+        // メッシュ化する
         let moonMesh = new THREE.Mesh(moonGeometory, moonMerial);
-
-        // 光原を追加
-        let derectionalLight = new THREE.DirectionalLight(0xffffff, 2);
-
-        camera.position.set(0, 0, +500);
+        console.log(moonMesh)
+        this.scene.add(earthMesh);
+        this.scene.add(moonMesh);
         moonMesh.position.set(-200, -200, -200)
-        derectionalLight.position.set(1, 1, 1);
 
-        scene.add(earthMesh);
-        scene.add(moonMesh);
-        scene.add(derectionalLight);
-
-        return {
-            scene: scene,
-            camera: camera,
-            renderer: renderer,
-            derectionalLight: derectionalLight,
-            earthMesh: earthMesh,
-            moonMesh: moonMesh,
-        }
-    },
-    mounted() {
         this.camera.updateProjectionMatrix();
-        let controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.renderer.render(this.scene, this.camera);
         this.$refs.canvas.appendChild(this.renderer.domElement);
     }

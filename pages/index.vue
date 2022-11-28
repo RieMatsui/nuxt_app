@@ -2,6 +2,8 @@
   <div>
     <no-ssr>
       <artwork></artwork>
+    </no-ssr>
+    <no-ssr>
       <space></space>
     </no-ssr>
   </div>
